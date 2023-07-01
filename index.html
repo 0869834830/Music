@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Music</title>
+</head>
+<body>
+    <div class="player ">
+        <div class="dashboard">
+            <div class="header">
+                <h4>Now playing:</h4>
+                <h2>Vì ngày hôm nay em cưới rồi</h2>
+            </div>
+            <div class="cd">
+                <div class="cd-thumb" style="background-image: url(/assets/img/song1.jpg )">
+                </div>
+            </div>
+            <div class="control">
+                <div class="btn btn-repeat">
+                    <i class="fas fa-redo"></i>
+                  </div>
+                  <div class="btn btn-prev">
+                    <i class="fas fa-step-backward"></i>
+                  </div>
+                  <div class="btn btn-toggle-play">
+                    <i class="fas fa-pause icon-pause"></i>
+                    <i class="fas fa-play icon-play"></i>
+                  </div>
+                  <div class="btn btn-next">
+                    <i class="fas fa-step-forward"></i>
+                  </div>
+                  <div class="btn btn-random">
+                    <i class="fas fa-random"></i>
+                  </div>
+            </div>
+
+            <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
+
+            <audio id="audio" src="">
+            </audio>
+            
+        </div>
+
+
+
+        <div class="playlist">
+        </div>
+    </div>
+    <script>
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);   
+
+        const cd=$('.cd')
+        const header =$('.header h2')
+        const audio = $('#audio')
+        const cdthumd=$('.cd-thumb')
+        const playBtn=$('.btn.btn-toggle-play')
+        const player = $('.player')
+        const app={
+            currentIndex:2,
+            isplaying:false,
+             songs:[
+                {
+                    name:" Andree Right Hand",
+                    singer:"Em iu ",
+                    path:'assets/music/song1.mp3',
+                    image:'/assets/img/song1.jpg'
+                },
+                {
+                    name:"Đạt G",
+                    singer:"Vì ngày hôm nay em cưới rồi",
+                    path:'assets/music/song2.mp3',
+                    image:'/assets/img/song2.jpg'
+                }
+                ,
+                {
+                    name:"Khải Đăng",
+                    singer:"Sợ ngày mai em đi mất",
+                    path:'assets/music/song3.mp3',
+                    image:'/assets/img/song3.jpg'
+                }
+                ,
+                {
+                    name:" Andree Right Hand",
+                    singer:"Em iu",
+                    path:'assets/music/song1.mp3',
+                    image:'/assets/img/song1.jpg'
+                },
+                {
+                    name:"Đạt G",
+                    singer:"Vì ngày hôm nay em cưới rồi",
+                    path:'assets/music/song2.mp3',
+                    image:'/assets/img/song2.jpg'
+                }
+                ,
+                {
+                    name:"Khải Đăng",
+                    singer:"Sợ ngày mai em đi mất",
+                    path:'assets/music/song3.mp3',
+                    image:'/assets/img/song3.jpg'
+                }
+                ,
+                {
+                    name:" Andree Right Hand",
+                    singer:"Em iu",
+                    path:'assets/music/song1.mp3',
+                    image:'/assets/img/song1.jpg'
+                },
+                {
+                    name:"Đạt G",
+                    singer:"Vì ngày hôm nay em cưới rồi",
+                    path:'assets/music/song2.mp3',
+                    image:'/assets/img/song2.jpg'
+                }
+                ,
+                {
+                    name:"Khải Đăng",
+                    singer:"Sợ ngày mai em đi mất",
+                    path:'assets/music/song3.mp3',
+                    image:'/assets/img/song3.jpg'
+                }
+            ],
+            RenDer : function()
+            {
+                const htmls =app.songs.map((song)=>
+                    `<div class="song">
+                        <div class="image">
+                            <div class="thumb" style="background-image: url('${song.image}')">
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3 class="title">${song.singer}</h3>
+                            <p class="author">${song.name}</p>
+                        </div>
+                        <div class="option">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                   </div>`
+                )
+                $('.playlist').innerHTML =htmls.join('')
+            },
+            defileProperties : function ()
+            {
+                Object.defineProperty(app,'currentSong',{
+                    get:function(){
+                        return app.songs[app.currentIndex]
+                    }
+                })
+            },
+
+
+            HandleEvents : function()
+            {
+                //Xử lý phóng to thu nhỏ CD
+                const cdWith = cd.offsetWidth
+                document.onscroll = function(){
+                    const scrollTop= window.scrollY || document.documentElement.scrollTop
+                    const newWidth= cdWith - scrollTop
+                    cd.style.width = newWidth > 0 ? newWidth   + 'px':0
+                    cd.style.opacity = newWidth  / cdWith 
+                }
+
+                //Xử lý nút play
+                playBtn.onclick= function ()
+                {
+                    if(app.isplaying === true)
+                    {
+                        audio.pause()
+                    }
+                    else
+                    {    
+                        audio.play()
+                    }
+                    //khi play thì
+                    audio.onplay=function()
+                    {
+                        app.isplaying=true
+                        player.classList.add('playing')
+                    }
+                    audio.onpause=function()
+                    //khi pause thì
+                    {
+                        app.isplaying=false
+                        player.classList.remove('playing')
+                    }
+                }
+            },
+            
+            loadcurrentSong :function()
+            {
+               
+
+                header.innerHTML=`${this.currentSong.singer}`
+                cdthumd.style.backgroundImage= `url('${this.currentSong.image}')`
+                audio.src=this.currentSong.path
+            },
+            
+            start :function()
+            {   
+                //Định nghĩa thuộc tính cho object
+                app.defileProperties()
+                //Lắng nghe và xử lý sự kiển của DOM events
+                app.HandleEvents()
+
+                //Hiện thị thông tin bài hát đầu tiên lên UI khi chạy ứng dụng
+                app.loadcurrentSong()
+                //Tải bài hát lên playlists
+                app.RenDer()
+            }
+        }
+        app.start()
+
+    </script>
+</body>
+</html>
