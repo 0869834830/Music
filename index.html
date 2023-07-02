@@ -62,17 +62,33 @@
         const cdthumd=$('.cd-thumb')
         const playBtn=$('.btn.btn-toggle-play')
         const player = $('.player')
-        const listSong=$('.playlist.song')
+        const listSong=$('.playlist')
         const btnNext=$('.btn.btn-next')
         const btnPrev=$('.btn.btn-prev')
         const btnRandom=$('.btn-random')
+        const btnRepeat=$('.btn-repeat')
+
 
 
         const app={
             currentIndex:0,
             isplaying:false,
             isRandom:false,
+            isRepet:false,
              songs:[
+                {
+                    name:"Quang Luân",
+                    singer:"Mình yêu nhau từ kiếp nào",
+                    path:'assets/music/song6.mp3',
+                    image:'./assets/img/song6.jpg'
+                }
+                ,
+                {
+                    name:"Quang Luân   ",
+                    singer:"Nhạc anh",
+                    path:'assets/music/song7.mp3',
+                    image:'./assets/img/song7.jpg'
+                },
                 {
                     name:" Andree Right Hand",
                     singer:"Em iu ",
@@ -94,49 +110,24 @@
                 }
                 ,
                 {
-                    name:" Andree Right Hand",
-                    singer:"Em iu",
-                    path:'assets/music/song1.mp3',
-                    image:'./assets/img/song1.jpg'
-                },
-                {
-                    name:"Đạt G",
-                    singer:"Vì ngày hôm nay em cưới rồi",
-                    path:'assets/music/song2.mp3',
-                    image:'./assets/img/song2.jpg'
+                    name:"Quâng A.P",
+                    singer:"Còn gì đau hơn chữ đã từng",
+                    path:'assets/music/song4.mp3',
+                    image:'./assets/img/song4.jpg'
                 }
                 ,
                 {
-                    name:"Khải Đăng",
-                    singer:"Sợ ngày mai em đi mất",
-                    path:'assets/music/song3.mp3',
-                    image:'./assets/img/song3.jpg'
+                    name:"Quang Luân",
+                    singer:"Yêu nhau xong rồi",
+                    path:'assets/music/song5.mp3',
+                    image:'./assets/img/song5.jpg'
                 }
-                ,
-                {
-                    name:" Andree Right Hand",
-                    singer:"Em iu",
-                    path:'assets/music/song1.mp3',
-                    image:'./assets/img/song1.jpg'
-                },
-                {
-                    name:"Đạt G",
-                    singer:"Vì ngày hôm nay em cưới rồi",
-                    path:'assets/music/song2.mp3',
-                    image:'./assets/img/song2.jpg'
-                }
-                ,
-                {
-                    name:"Khải Đăng",
-                    singer:"Sợ ngày mai em đi mất",
-                    path:'assets/music/song3.mp3',
-                    image:'./assets/img/song3.jpg'
-                }
+                
             ],
             RenDer : function()
             {
-                const htmls =app.songs.map((song)=>
-                    `<div class="song">
+                const htmls =app.songs.map((song,index)=>
+                    `<div class="song" data=${index} >
                         <div class="image">
                             <div class="thumb" style="background-image: url('${song.image}')">
                             </div>
@@ -151,6 +142,10 @@
                    </div>`
                 )
                 $('.playlist').innerHTML =htmls.join('')
+                // function getSong(index)
+                // {
+                //     console.log(index)
+                // }
             },
             defileProperties : function ()
             {
@@ -239,20 +234,51 @@
                     }
                     else(
                         app.nextSong()
-                    )
+                        )
                     audio.play()
                 }
                 btnPrev.onclick=function()
                 {
-                    app.nextPrev()
-                    audio.play()
-                }
-
+                    if(app.isRandom)
+                    {
+                        app.playRandomSong()
+                    }
+                    else(
+                        app.nextPrev()
+                        )
+                        audio.play()
+                    }
+                    
                 //btn Random
                 btnRandom.onclick =function()
                 {
                     app.isRandom = !app.isRandom
                     this.classList.toggle('active',app.isRandom )
+                }
+                //Tự next bài hát khi kết thúc bài hát
+                audio.onended = function()
+                {
+                    if(app.isRepet)
+                    {
+                        audio.play()
+                    }
+                    else{
+
+                        btnNext.click()
+                    }
+                }
+                //lặp lại
+                btnRepeat.onclick=function()
+                {
+                    app.isRepet = !app.isRepet
+                    this.classList.toggle('active',app.isRepet )
+                }
+                listSong.onclick=function(e)
+                {
+                    const indexSong =e.target.closest('.song').getAttribute('data')
+                    app.currentIndex = indexSong
+                    app.loadcurrentSong()
+                    audio.play()
                 }
             },
             
@@ -288,7 +314,7 @@
                 let newIndex
                 do{
                     newIndex=Math.floor(Math.random() * app.songs.length)
-                }while(app.currentIndex === newIndex )
+                }while( newIndex ===  app.currentIndex )
                 app.currentIndex = newIndex
                 app.loadcurrentSong()
             },
