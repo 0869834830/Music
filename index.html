@@ -34,7 +34,7 @@
                   <div class="btn btn-next">
                     <i class="fas fa-step-forward"></i>
                   </div>
-                  <div class="btn btn-random">
+                  <div class="btn btn-random ">
                     <i class="fas fa-random"></i>
                   </div>
             </div>
@@ -58,12 +58,20 @@
         const cd=$('.cd')
         const header =$('.header h2')
         const audio = $('#audio')
+        const progress = $('#progress')
         const cdthumd=$('.cd-thumb')
         const playBtn=$('.btn.btn-toggle-play')
         const player = $('.player')
+        const listSong=$('.playlist.song')
+        const btnNext=$('.btn.btn-next')
+        const btnPrev=$('.btn.btn-prev')
+        const btnRandom=$('.btn-random')
+
+
         const app={
-            currentIndex:2,
+            currentIndex:0,
             isplaying:false,
+            isRandom:false,
              songs:[
                 {
                     name:" Andree Right Hand",
@@ -153,11 +161,24 @@
                 })
             },
 
-
+            //Các sự kiện lắng nghe và xử lý sự kiện của DOM events
             HandleEvents : function()
             {
+                //Cd QUAY
+                const cdTurn = cdthumd.animate([
+                    {
+                        transform:'rotate(360deg)'
+                    }
+                ],{
+                    duration:10000,
+                    iterations:Infinity
+                })
+                cdTurn.pause()
+
+
                 //Xử lý phóng to thu nhỏ CD
                 const cdWith = cd.offsetWidth
+                // document.onscroll: Lấy ra sự kiện kéo chuột
                 document.onscroll = function(){
                     const scrollTop= window.scrollY || document.documentElement.scrollTop
                     const newWidth= cdWith - scrollTop
@@ -168,7 +189,7 @@
                 //Xử lý nút play
                 playBtn.onclick= function ()
                 {
-                    if(app.isplaying === true)
+                    if(app.isplaying )
                     {
                         audio.pause()
                     }
@@ -176,18 +197,62 @@
                     {    
                         audio.play()
                     }
-                    //khi play thì
-                    audio.onplay=function()
+                }
+                //khi play thì
+                audio.onplay=function()
+                {
+                    app.isplaying=true
+                    player.classList.add('playing')
+                    cdTurn.play()
+                }
+                audio.onpause=function()
+                //khi pause thì
+                {
+                    app.isplaying=false
+                    player.classList.remove('playing')
+                    cdTurn.pause()
+                }
+                //Khi tiến độ bài hát thay đổi
+                audio.ontimeupdate=function()
+                {
+                    if(audio.duration )
                     {
-                        app.isplaying=true
-                        player.classList.add('playing')
+                        //duration: Tổng thời gian bài hát
+                        //currentTime:khoảng thời gian đang chạy
+                        const currentProgress=Math.floor(audio.currentTime /audio.duration *100)
+                        progress.value =currentProgress
                     }
-                    audio.onpause=function()
-                    //khi pause thì
+                   
+                }
+                //Khi tua bài hát 
+                progress.onchange = function(e)
+                {
+                    //e.target.value :lấy ra value % của bài hát đang phát
+                    const second= audio.duration /100 * e.target.value
+                    audio.currentTime = second
+                }
+                btnNext.onclick=function()
+                {
+                    if(app.isRandom)
                     {
-                        app.isplaying=false
-                        player.classList.remove('playing')
+                        app.playRandomSong()
                     }
+                    else(
+                        app.nextSong()
+                    )
+                    audio.play()
+                }
+                btnPrev.onclick=function()
+                {
+                    app.nextPrev()
+                    audio.play()
+                }
+
+                //btn Random
+                btnRandom.onclick =function()
+                {
+                    app.isRandom = !app.isRandom
+                    this.classList.toggle('active',app.isRandom )
                 }
             },
             
@@ -199,7 +264,34 @@
                 cdthumd.style.backgroundImage= `url('${this.currentSong.image}')`
                 audio.src=this.currentSong.path
             },
-            
+            nextSong: function()
+            {
+               
+                    app.currentIndex++
+                    if(app.currentIndex >= app.songs.length)
+                    {
+                        app.currentIndex =0
+                    }
+                    app.loadcurrentSong()
+            },
+            nextPrev:function()
+            {
+                    app.currentIndex--
+                    if(app.currentIndex <0)
+                    {
+                        app.currentIndex = app.songs.length-1
+                    }
+                    app.loadcurrentSong()
+            },
+            playRandomSong:function()
+            {
+                let newIndex
+                do{
+                    newIndex=Math.floor(Math.random() * app.songs.length)
+                }while(app.currentIndex === newIndex )
+                app.currentIndex = newIndex
+                app.loadcurrentSong()
+            },
             start :function()
             {   
                 //Định nghĩa thuộc tính cho object

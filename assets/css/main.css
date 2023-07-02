@@ -78,6 +78,9 @@
     font-size:25px ;
     color: #ebebeb;
 }
+.active {
+  color: var(--primary-color);
+}
 .btn .icon-pause
 {
     display: none;
@@ -143,3 +146,4 @@
  .option{
     margin-left:auto;
     }
+  
